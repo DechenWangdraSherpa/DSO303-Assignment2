@@ -33,8 +33,8 @@ A university with 8,000 students and 400 staff moves exams and assignment submis
 | [scripts/](scripts/) | `deploy.sh`, `teardown.sh`, `smoke-test.sh`, `verify-infra.sh`, `simulate-walkthrough1.sh`, `simulate-walkthrough2.sh`, `simulate-az-failure.sh` |
 | [.github/workflows/deploy.yml](.github/workflows/deploy.yml) | CI/CD: push to `main` → validate → deploy → smoke test |
 | [screenshots/](screenshots/) | Evidence from the working deployment (9 images) |
-| [evidence/](evidence/) | Cloud Architecture Lab images (see [evidence/README.md](evidence/README.md)) |
-| [report/](report/) | Assignment report (PDF) |
+| [evidence/](evidence/) | Cloud Architecture Lab screenshots (6 images) and the lab files in [evidence/lab-json/](evidence/lab-json/) (see [Cloud Architecture Lab](#cloud-architecture-lab) below) |
+| [report/DSO303_Assignment2_Report.md](report/DSO303_Assignment2_Report.md) | Assignment report |
 
 ## Deploy
 
@@ -78,6 +78,18 @@ Before the first real deploy, delegate the Route 53 zone's NS records for `Domai
 ./scripts/simulate-walkthrough2.sh   # 40 MB presigned upload -> S3 event -> Aurora -> SES email to tutor; 55 MB and .exe refused
 ./scripts/simulate-az-failure.sh     # lose us-east-1a mid-exam: Aurora failover + Lambda on AZ-b only, while traffic runs
 ```
+
+## Cloud Architecture Lab
+
+The same design is provided as five lab files. To load one, open the lab, click **Export → Upload JSON** and choose the file. Then run the simulation shown in the table.
+
+| Lab file | Mode | What it shows | Screenshot |
+|---|---|---|---|
+| `lab-01-full-architecture.json` | Design | The full two-AZ build | `lab-01-full-architecture.png` |
+| `lab-02-walkthrough1.json` | Simulate → **Send Request** | Walkthrough 1, HTTP 200 | `lab-02-walkthrough1-exam-autosave.png` |
+| `lab-03a-walkthrough2-upload.json` | Simulate → **Send Request** | Walkthrough 2, part 1 (upload), HTTP 202 | `lab-03a-walkthrough2-upload.png` |
+| `lab-03b-walkthrough2-notify.json` | Simulate → **Send Request** | Walkthrough 2, part 2 (tutor notified), HTTP 202 | `lab-03b-walkthrough2-tutor-notified.png` |
+| `lab-04-az-failure.json` | Failure Lab (AZ-A outage already injected) → **Send Request**, then back to **Failure Lab** | AZ-A lost, request still HTTP 200 | `lab-04-az-failure.png`, `lab-04b-az-failure-request-via-azb.png` |
 
 ## Tear down
 
