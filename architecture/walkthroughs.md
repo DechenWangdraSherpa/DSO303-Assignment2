@@ -2,7 +2,7 @@
 
 ![Production architecture](architecture.png)
 
-The diagram is generated from [build_diagram.py](build_diagram.py) (SVG: [architecture.svg](architecture.svg)). How the design handles the exam peak and the loss of an AZ is in [peak-and-az-failure.md](peak-and-az-failure.md).
+How the design handles the exam peak and the loss of an AZ is in [peak-and-az-failure.md](peak-and-az-failure.md).
 
 ## Tiers at a glance
 

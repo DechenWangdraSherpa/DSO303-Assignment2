@@ -1,0 +1,23 @@
+{
+  "description": "Exam platform - lose Availability Zone A (real AWS). Fails Aurora over to AZ-b and cuts network for AZ-a subnets for 10 minutes.",
+  "roleArn": "arn:aws:iam::ACCOUNT_ID:role/exams-prod-fis",
+  "stopConditions": [{ "source": "aws:cloudwatch:alarm", "value": "arn:aws:cloudwatch:us-east-1:ACCOUNT_ID:alarm:exams-prod-api-5xx" }],
+  "targets": {
+    "aurora": { "resourceType": "aws:rds:cluster", "resourceTags": { "aws:cloudformation:stack-name": "exams-prod" }, "selectionMode": "ALL" },
+    "subnetsAzA": {
+      "resourceType": "aws:ec2:subnet",
+      "resourceTags": { "aws:cloudformation:stack-name": "exams-prod" },
+      "filters": [{ "path": "AvailabilityZone", "values": ["us-east-1a"] }],
+      "selectionMode": "ALL"
+    }
+  },
+  "actions": {
+    "failoverAurora": { "actionId": "aws:rds:failover-db-cluster", "targets": { "Clusters": "aurora" } },
+    "isolateAzA": {
+      "actionId": "aws:network:disrupt-connectivity",
+      "parameters": { "duration": "PT10M", "scope": "all" },
+      "targets": { "Subnets": "subnetsAzA" }
+    }
+  },
+  "tags": { "Project": "exam-platform" }
+}
