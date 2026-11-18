@@ -32,9 +32,9 @@ A university with 8,000 students and 400 staff moves exams and assignment submis
 | [app/frontend/](app/frontend/) | Single-page web app (no build step) |
 | [scripts/](scripts/) | `deploy.sh`, `teardown.sh`, `smoke-test.sh`, `verify-infra.sh`, `simulate-walkthrough1.sh`, `simulate-walkthrough2.sh`, `simulate-az-failure.sh` |
 | [.github/workflows/deploy.yml](.github/workflows/deploy.yml) | CI/CD: push to `main` → validate → deploy → smoke test |
-| [screenshots/](screenshots/) | Evidence from the working deployment (9 images) |
+| [screenshots/](screenshots/) | Evidence from the working deployment and the CI/CD run (10 images) |
 | [evidence/](evidence/) | Cloud Architecture Lab screenshots (6 images) and the lab files in [evidence/lab-json/](evidence/lab-json/) (see [Cloud Architecture Lab](#cloud-architecture-lab) below) |
-| [report/DSO303_Assignment2_Report.md](report/DSO303_Assignment2_Report.md) | Assignment report |
+| [report/README.md](report/README.md) | Assignment report |
 
 ## Deploy
 

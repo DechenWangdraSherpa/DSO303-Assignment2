@@ -184,7 +184,7 @@ The whole system is written as code in **one CloudFormation template** (`infra/c
 
 The system was deployed to **Floci**, the local AWS emulator used in the DSO303 labs. Floci runs Lambda and the Aurora database as real containers, so everything shown below really happened: real sign-in tokens, real Lambda code, real database queries, real S3 files, real queue messages and real emails.
 
-The evidence is kept short: nine screenshots, each showing one requirement working.
+The evidence is kept short: ten screenshots, each showing one requirement working.
 
 ### 4.2 Infrastructure deployed from code
 
@@ -244,33 +244,39 @@ For real AWS, GitHub signs in to AWS with a short-lived role (OIDC), so no AWS p
 
 Removing the system is also done by code: `scripts/teardown.sh` empties the storage, deletes the stack and cleans up. It was used to start from an empty emulator before Figure 4.
 
+To show that a push really redeploys the system, the repository was pushed to GitHub with a self-hosted runner on the Floci machine. The push started the pipeline by itself, with no manual steps.
+
+![Figure 13](../screenshots/10-ci-cd-pipeline-green.png)
+
+*Figure 13. The GitHub Actions run started by a push to `main`: the validate and deploy-emulator jobs both pass (deploy-aws is skipped because the target is the emulator). The Deploy step updates the CloudFormation stack, sets up the database and publishes the website, and the Smoke test step passes.*
+
 ### 4.7 Cloud Architecture Lab build
 
 The same design was also built in the course's Cloud Architecture Lab. The lab files in `evidence/lab-json/` use the same names, subnets and permissions as the CloudFormation template. They were loaded with **Export → Upload JSON** and then simulated in the lab.
 
-![Figure 13](../evidence/lab-01-full-architecture.png)
+![Figure 14](../evidence/lab-01-full-architecture.png)
 
-*Figure 13. The complete design in the Cloud Architecture Lab: the edge services, the VPC with AZ-A and AZ-B (each with a public, app and data subnet), the regional services, and the GitHub → GitHub Actions → CloudFormation pipeline.*
+*Figure 14. The complete design in the Cloud Architecture Lab: the edge services, the VPC with AZ-A and AZ-B (each with a public, app and data subnet), the regional services, and the GitHub → GitHub Actions → CloudFormation pipeline.*
 
-![Figure 14](../evidence/lab-02-walkthrough1-exam-autosave.png)
+![Figure 15](../evidence/lab-02-walkthrough1-exam-autosave.png)
 
-*Figure 14. Walkthrough 1 in the lab: Student → Route 53 → CloudFront → API Gateway → Lambda (AZ-A) → DynamoDB. The lab checks the Lambda's permissions and the result is HTTP 200 (success) in 154 ms.*
+*Figure 15. Walkthrough 1 in the lab: Student → Route 53 → CloudFront → API Gateway → Lambda (AZ-A) → DynamoDB. The lab checks the Lambda's permissions and the result is HTTP 200 (success) in 154 ms.*
 
-![Figure 15](../evidence/lab-03a-walkthrough2-upload.png)
+![Figure 16](../evidence/lab-03a-walkthrough2-upload.png)
 
-*Figure 15. Walkthrough 2, part 1: the file goes straight to S3 (the line only crosses the VPC on the drawing), S3 puts a message in the upload queue, and the upload-processor Lambda handles it. Result: HTTP 202 (accepted).*
+*Figure 16. Walkthrough 2, part 1: the file goes straight to S3 (the line only crosses the VPC on the drawing), S3 puts a message in the upload queue, and the upload-processor Lambda handles it. Result: HTTP 202 (accepted).*
 
-![Figure 16](../evidence/lab-03b-walkthrough2-tutor-notified.png)
+![Figure 17](../evidence/lab-03b-walkthrough2-tutor-notified.png)
 
-*Figure 16. Walkthrough 2, part 2: the upload-processor Lambda puts the tutor notification in the notify queue and the notifier Lambda handles it. The dashed lines show the email going through SES to the tutor. Result: HTTP 202 (accepted).*
+*Figure 17. Walkthrough 2, part 2: the upload-processor Lambda puts the tutor notification in the notify queue and the notifier Lambda handles it. The dashed lines show the email going through SES to the tutor. Result: HTTP 202 (accepted).*
 
-![Figure 17](../evidence/lab-04-az-failure.png)
+![Figure 18](../evidence/lab-04-az-failure.png)
 
-*Figure 17. AZ-A failure in the lab's Failure Lab: 3 parts in AZ-A fail (NAT gateway A, Lambda AZ-A and the Aurora writer), and the 5 parts that depend on them survive by switching to AZ-B. The autosave request still succeeds (HTTP 200).*
+*Figure 18. AZ-A failure in the lab's Failure Lab: 3 parts in AZ-A fail (NAT gateway A, Lambda AZ-A and the Aurora writer), and the 5 parts that depend on them survive by switching to AZ-B. The autosave request still succeeds (HTTP 200).*
 
-![Figure 18](../evidence/lab-04b-az-failure-request-via-azb.png)
+![Figure 19](../evidence/lab-04b-az-failure-request-via-azb.png)
 
-*Figure 18. The same request during the AZ-A failure: it now goes through Lambda (AZ-B) and NAT gateway B, and still succeeds (HTTP 200).*
+*Figure 19. The same request during the AZ-A failure: it now goes through Lambda (AZ-B) and NAT gateway B, and still succeeds (HTTP 200).*
 
 Two differences between the lab and the CloudFormation template:
 
@@ -285,7 +291,7 @@ This table connects each requirement to the part of the design that meets it and
 
 | Requirement | How the design meets it | Evidence |
 |---|---|---|
-| VPC with public and private subnets in two AZs | 6 subnets in 3 layers, built in both AZs; a NAT gateway in each AZ; the data layer has no internet access | Figures 1, 5, 13 |
+| VPC with public and private subnets in two AZs | 6 subnets in 3 layers, built in both AZs; a NAT gateway in each AZ; the data layer has no internet access | Figures 1, 5, 14 |
 | Edge: DNS, CDN, WAF | Route 53 → CloudFront (with HTTPS) + WAF | Figures 1, 5 |
 | Sign-in based on role | Cognito groups; the token is checked on every request; wrong role refused | Figures 7, 12 |
 | Timed exam with autosave every 30 seconds | The server sets the end time; answers saved in DynamoDB | Figures 6, 7 |
@@ -293,13 +299,13 @@ This table connects each requirement to the part of the design that meets it and
 | Uploads up to 50 MB (PDF/ZIP) | Presigned upload link that enforces size, type and encryption | Figures 8, 9 |
 | Emails for results and new uploads | Notify queue → notifier Lambda → SES | Figures 9, 10 |
 | Database in two AZs | Aurora writer in AZ-a, standby in AZ-b, automatic switch-over | Figures 5, 11 |
-| Survive the loss of one AZ | Every layer exists in both AZs; regional services | Figures 11, 17, 18 |
+| Survive the loss of one AZ | Every layer exists in both AZs; regional services | Figures 11, 18, 19 |
 | Lose at most 5 minutes; recover within 1 hour | Autosaves stored in several AZs; point-in-time backups; switch-over under a minute | Figures 7, 11 |
 | Keep records for 5 years | S3 deletes after 5 years; AWS Backup keeps monthly copies for 5 years | Figures 5, 9 |
 | Encryption when sent and when stored | HTTPS everywhere; KMS encryption for all stored data | Figures 5, 9 |
 | Monitoring and secrets | CloudWatch alarms and dashboard, X-Ray, Secrets Manager | Figure 5 |
-| Infrastructure as code; push to main redeploys | CloudFormation + GitHub Actions | Figures 4, 12 |
-| Cloud Architecture Lab build, both walkthroughs, AZ failure | Lab files made from the same design | Figures 13–18 |
+| Infrastructure as code; push to main redeploys | CloudFormation + GitHub Actions; a push to `main` ran the whole pipeline on its own | Figures 4, 12, 13 |
+| Cloud Architecture Lab build, both walkthroughs, AZ failure | Lab files made from the same design | Figures 14–19 |
 
 ---
 
