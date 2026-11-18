@@ -1,0 +1,76 @@
+# CI/CD: every push to main validates, deploys and smoke-tests the whole platform.
+#
+#  Target is chosen with the repository variable DEPLOY_TARGET:
+#    emulator (default) -> self-hosted runner labelled "floci" on the machine running Floci
+#    aws                -> GitHub-hosted runner, AWS credentials via OIDC (no stored keys)
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false      # never cancel a half-finished CloudFormation update
+
+permissions:
+  contents: read
+  id-token: write                # for OIDC to AWS
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Lint CloudFormation
+        run: pip install --quiet cfn-lint && cfn-lint infra/cloudformation/exam-platform.yaml
+      - name: Check Lambda code
+        working-directory: app/functions
+        run: npm ci --omit=dev && for f in src/*.mjs; do node --check "$f"; done
+      - name: Check shell scripts
+        run: shellcheck -S error scripts/*.sh
+      - name: Check frontend
+        run: node --check app/frontend/app.js
+
+  deploy-emulator:
+    if: github.event_name != 'pull_request' && vars.DEPLOY_TARGET != 'aws'
+    needs: validate
+    runs-on: [self-hosted, floci]
+    environment: emulator
+    env:
+      AWS_PROFILE: floci
+      PLATFORM: emulator
+    steps:
+      - uses: actions/checkout@v4
+      - name: Start Floci (idempotent)
+        run: ./scripts/floci-up.sh
+      - name: Deploy
+        run: ./scripts/deploy.sh
+      - name: Smoke test
+        run: ./scripts/smoke-test.sh
+
+  deploy-aws:
+    if: github.event_name != 'pull_request' && vars.DEPLOY_TARGET == 'aws'
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: production        # add required reviewers here for a manual approval gate
+    env:
+      PLATFORM: aws
+      AWS_REGION: us-east-1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+      - name: Deploy
+        run: ./scripts/deploy.sh

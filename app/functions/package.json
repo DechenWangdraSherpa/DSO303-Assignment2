@@ -1,0 +1,13 @@
+{
+  "name": "exam-platform-functions",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Lambda handlers for the online exams platform (API, marking, uploads, notifications, DB migration)",
+  "dependencies": {
+    "pg": "8.13.1"
+  },
+  "scripts": {
+    "test": "node --test test/"
+  }
+}

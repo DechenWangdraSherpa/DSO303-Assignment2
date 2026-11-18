@@ -1,0 +1,6 @@
+node_modules/
+.floci-data/
+app/frontend/config.js
+*.zip
+.env
+.DS_Store

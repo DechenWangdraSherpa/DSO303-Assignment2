@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Online Exams Portal</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Online Exams Portal</div>
+    <div id="who" class="who"></div>
+  </header>
+
+  <main>
+    <!-- Sign in -->
+    <section id="view-login" class="card narrow">
+      <h1>Sign in</h1>
+      <p class="muted">Use your university account. Your role (student, tutor or administrator) comes from your Cognito group.</p>
+      <form id="login-form">
+        <label>Username <input id="username" autocomplete="username" required></label>
+        <label>Password <input id="password" type="password" autocomplete="current-password" required></label>
+        <button type="submit">Sign in</button>
+        <p id="login-error" class="error"></p>
+      </form>
+    </section>
+
+    <!-- Student home -->
+    <section id="view-student" hidden>
+      <div class="grid">
+        <div class="card">
+          <h2>My exams</h2>
+          <ul id="exam-list" class="list"></ul>
+        </div>
+        <div class="card">
+          <h2>Submit an assignment</h2>
+          <p class="muted">PDF or ZIP, up to 50 MB. The file goes straight to secure storage.</p>
+          <label>Assignment
+            <select id="assignment"><option value="A2">DSO303 Assignment 2</option></select>
+          </label>
+          <input id="file" type="file" accept=".pdf,.zip,application/pdf,application/zip">
+          <button id="upload-btn">Upload</button>
+          <progress id="upload-progress" max="100" value="0" hidden></progress>
+          <p id="upload-status" class="status"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Exam room -->
+    <section id="view-exam" hidden>
+      <div class="exam-head card">
+        <div>
+          <h1 id="exam-title"></h1>
+          <p class="muted" id="exam-meta"></p>
+        </div>
+        <div class="exam-side">
+          <div id="timer" class="timer">--:--</div>
+          <div id="save-status" class="save-status">Not saved yet</div>
+        </div>
+      </div>
+      <form id="exam-form" class="card"></form>
+      <div class="actions">
+        <button id="save-now" class="secondary">Save now</button>
+        <button id="submit-exam">Submit exam</button>
+      </div>
+      <p id="exam-status" class="status"></p>
+    </section>
+
+    <!-- Tutor -->
+    <section id="view-tutor" hidden>
+      <div class="card">
+        <h2>Latest submissions</h2>
+        <table><thead><tr><th>Student</th><th>Course / assignment</th><th>Size</th><th>Received</th><th>Tutor emailed</th></tr></thead>
+          <tbody id="subs"></tbody></table>
+        <button id="refresh-subs" class="secondary">Refresh</button>
+      </div>
+      <div class="card">
+        <h2>Results: DSO303-MIDTERM</h2>
+        <table><thead><tr><th>Student</th><th>Score</th><th>Marked</th><th>Released</th></tr></thead>
+          <tbody id="results"></tbody></table>
+        <button id="release">Release results &amp; email students</button>
+        <p id="release-status" class="status"></p>
+      </div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

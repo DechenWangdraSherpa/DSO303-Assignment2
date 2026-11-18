@@ -1,0 +1,13 @@
+{
+  "examId": "DSO303-MIDTERM",
+  "courseId": "DSO303",
+  "title": "DSO303 Cloud Architecture Mid-term",
+  "durationMinutes": 60,
+  "questions": [
+    {"id": "q1", "type": "mcq", "marks": 2, "text": "Which service lets the browser upload a 50 MB file directly to S3 without passing through the API?", "options": ["Presigned URL / POST", "NAT Gateway", "RDS Proxy", "AWS WAF"], "answer": "Presigned URL / POST"},
+    {"id": "q2", "type": "mcq", "marks": 2, "text": "An Aurora cluster survives the loss of one Availability Zone because...", "options": ["A reader in another AZ is promoted to writer", "CloudFront caches the database", "Snapshots are taken hourly", "The VPC has two route tables"], "answer": "A reader in another AZ is promoted to writer"},
+    {"id": "q3", "type": "mcq", "marks": 2, "text": "Which component absorbs a burst of 3,000 exam submissions so marking does not overload the database?", "options": ["Amazon SQS queue", "Route 53", "Internet Gateway", "AWS KMS"], "answer": "Amazon SQS queue"},
+    {"id": "q4", "type": "mcq", "marks": 2, "text": "What does an RPO of 5 minutes mean?", "options": ["At most 5 minutes of data may be lost", "The system restarts in 5 minutes", "Backups are kept for 5 minutes", "Pages load in under 5 minutes"], "answer": "At most 5 minutes of data may be lost"},
+    {"id": "q5", "type": "short", "marks": 4, "text": "In two sentences, explain why the exam answers are autosaved to DynamoDB instead of Aurora."}
+  ]
+}
