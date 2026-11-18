@@ -572,7 +572,7 @@ Resources:
       Code: {S3Bucket: !Ref ArtifactBucket, S3Key: !Ref CodeKey}
       Role: !GetAtt FunctionRole.Arn
       MemorySize: 512
-      Timeout: 15
+      Timeout: 29
       TracingConfig: {Mode: Active}
       VpcConfig:
         SubnetIds: [!Ref AppSubnetA, !Ref AppSubnetB]
@@ -817,7 +817,7 @@ Resources:
       IntegrationType: AWS_PROXY
       IntegrationUri: !If [IsAws, !Ref ExamApiLiveAlias, !GetAtt ExamApiFunction.Arn]
       PayloadFormatVersion: '2.0'
-      TimeoutInMillis: 15000
+      TimeoutInMillis: 29000
   HealthRoute:
     Type: AWS::ApiGatewayV2::Route
     Properties:

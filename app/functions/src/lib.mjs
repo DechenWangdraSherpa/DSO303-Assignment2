@@ -39,7 +39,7 @@ export async function db() {
     database: process.env.DB_NAME || 'exams',
     max: 2,                      // small per-container pool; RDS Proxy multiplexes on AWS
     idleTimeoutMillis: 10_000,
-    connectionTimeoutMillis: 5_000,
+    connectionTimeoutMillis: 15_000, // a cold connection can be slow on a busy machine
     ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
   });
   return pool;
